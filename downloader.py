@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import urllib.request
 import os
+import sys
 import traceback
 
 def read_url_page(url):
@@ -37,40 +38,46 @@ def download_file(url, file_name = None):
     except IOError as exception:
         raise exception
 
-def do_input(questions_list = ['0: exit', '1: put url']):
+def do_input(questions_list = ['exit', 'put url']):
     while True:
         print('\nMake a choice(put number):')
         
-        number = 0
-        
-        for question in questions_list:
-            print(''.join('{number}: {question}'.format(number = number, question = question)))
-            
-            number += 1
+        do_output(questions_list)
         
         try:
             answer = int(input('put number: '))
             
             if answer > -1 and answer < len(questions_list):
-                return answer
+                return (answer, questions_list[answer])
         
         except ValueError as exception:
             print(exception)
 
+def do_output(result_list):
+    for number in range(len(result_list)):
+        print(''.join('{number}: {data}'.format(number = number, data = result_list[number])))
     
 def main():
-    text_html = ''
-    folders_list = None
+    default_questions = ['exit', 'put url']
+    choice = do_input()
     
-    #page = urllib.request.urlopen('saved_resource.html')
+    if choice[1] == 'exit':
+        sys.exit(1)
     
-    folders_list = get_links_list('saved_resource.html')
+    url = input('put url: ')
     
-    for link in folders_list:
-        print(link)
-    
-    do_input(folders_list)
-    
+    while True:
+        #page = urllib.request.urlopen(url)
+        folders_list = get_links_list('saved_resource.html')
+        
+        for i in range(len(default_questions)):
+            folders_list.insert(i, default_questions[i])
+        #    print(link)
+        choice = do_input(folders_list)
+        
+        if choice[1] == 'exit':
+            sys.exit(1)
+
 if __name__ == '__main__':
     main()
     
