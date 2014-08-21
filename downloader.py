@@ -4,7 +4,9 @@ import os
 import traceback
 
 def read_url_page(url):
+    #try:
     #page = urllib.request.urlopen(url) paste when url - http instead with open
+    #except urllib.request.URLError as exception:
     with open(url, 'r') as page:
         page = page.read()
     
@@ -29,14 +31,33 @@ def download_file(url, file_name = None):
     file_name = os.path.basename(file_name.path)
     
     try:
-        urllib.request.urlretrieve(url, file_name)
+        response = urllib.request.urlretrieve(url, file_name)
         
         return True
-    except:
-        traceback.print_exc()
-        
-        return False
+    except IOError as exception:
+        raise exception
 
+def do_input(questions_list = ['0: exit', '1: put url']):
+    while True:
+        print('\nMake a choice(put number):')
+        
+        number = 0
+        
+        for question in questions_list:
+            print(''.join('{number}: {question}'.format(number = number, question = question)))
+            
+            number += 1
+        
+        try:
+            answer = int(input('put number: '))
+            
+            if answer > -1 and answer < len(questions_list):
+                return answer
+        
+        except ValueError as exception:
+            print(exception)
+
+    
 def main():
     text_html = ''
     folders_list = None
@@ -45,11 +66,11 @@ def main():
     
     folders_list = get_links_list('saved_resource.html')
     
-    
     for link in folders_list:
         print(link)
-
+    
+    do_input(folders_list)
+    
 if __name__ == '__main__':
     main()
-    
     
