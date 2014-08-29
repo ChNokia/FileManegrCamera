@@ -8,7 +8,7 @@ class DataIPCam(object):
         self.__url_parse = urllib.parse.urlparse(abspath)
         self.__size = size
         self.__name = self.__url_parse.path
-        #self.__date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
+        self.__date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
         
         if self.__name == '':
             self.__name = os.path.dirname(abspath)
@@ -22,9 +22,12 @@ class DataIPCam(object):
     def url(self):
         return self.__url_parse.geturl()
     
-    @property
-    def date(self):
+    def get_date(self):
         return self.__date
+    
+    @property
+    def size(self):
+        return self.__size
     
     def get_last_dir(self):
         folders_list = self.__name.split('/')
