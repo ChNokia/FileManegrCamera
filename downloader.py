@@ -57,7 +57,7 @@ def download_file(url, file_name = None):
     except IOError as exception:
         raise exception
 
-def do_input(questions_list = ['exit', 'put url']):
+def do_input(questions_list = [['exit'], ['put url']]):
     while True:
         print('\nMake a choice(put number):')
         
@@ -76,7 +76,8 @@ def do_input(questions_list = ['exit', 'put url']):
 
 def do_output(result_list):
     for number in range(len(result_list)):
-        print(''.join('{number}: {data}'.format(number = number, data = result_list[number])))
+        #data = '/t'.join([part for part in result_list[number]])
+        print(''.join('{number}: {data}'.format(number = number, data = result_list[number][0])))
 
 def get_links_list(data_list):
     links_list = []
@@ -90,7 +91,7 @@ def get_dir_list(data_list):
     links_list = []
     
     for data in data_list:
-        links_list.append(data.get_last_dir())
+        links_list.append([data.get_last_dir(), data.size, data.get_date()])
     
     return links_list
     
@@ -120,11 +121,11 @@ def main():
         folders_list = get_dir_list(data_list)
         
         #for i in range(len(default_questions)):
-        folders_list.insert(0, default_questions[0])
+        folders_list.insert(0, [default_questions[0]])
         #    print(link)
         choice = do_input(folders_list)
         
-        if choice[1] == 'exit':
+        if choice[1][0] == 'exit':
             sys.exit(1)
         
         #url = ''.join([data_list[choice[0] - 1].url, 'saved_resource.html'])
