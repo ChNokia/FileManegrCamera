@@ -1,3 +1,5 @@
+resource_file = 'saved_resource.htm'
+
 from bs4 import BeautifulSoup
 import urllib.request
 import os
@@ -8,10 +10,10 @@ import DataIPCam
 
 def read_url_page(url):
     #try:
-    #page = urllib.request.urlopen(url) paste when url - http instead with open
+    page = urllib.request.urlopen(url) #paste when url - http instead with open
     
-    with open(url, 'r') as page:
-        page = page.read()
+    #with open(url, 'r') as page:
+    page = page.read()
     
     return page
     
@@ -19,8 +21,6 @@ def get_DataIPCam_list(url):
     data_list = []
     page = read_url_page(url)
     soup = BeautifulSoup(page)
-    
-    #href_list = soup.pre.hr.findAll('a')
     http = None
     date = None
     size = None
@@ -29,18 +29,31 @@ def get_DataIPCam_list(url):
         str_link = str(link)
         
         if not http:
-            http = re.search("http://192.168.1.3/sd/011/.*\" ", str_link)
+            http = re.search('http://192.168.1.3/sd/011/.*\" ', str_link)
         else:
-            size = re.search("(\d{1,4})KB", str_link)
-            date = re.search("(\d{1,4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})", str_link)
+            http_next = re.search('http://192.168.1.3/sd/011/.*\" ', str_link)
             
-            if date:
-                data = DataIPCam.DataIPCam(http.group(0)[:-2], date.group(0), size)
-                http = None
+            if http_next:
+                data = DataIPCam.DataIPCam(http.group(0)[:-2], date, size)
+                http = http_next
                 date = None
                 size = None
-                
+
                 data_list.append(data)
+            else:
+                size = re.search("(\d{1,4})KB", str_link)
+                date = re.search("(\d{1,4})-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})", str_link)
+                
+                if date:
+                    if size:
+                        size = size.group(0)
+
+                    data = DataIPCam.DataIPCam(http.group(0)[:-2], date.group(0), size)
+                    http = None
+                    date = None
+                    size = None
+                    
+                    data_list.append(data)
 
     return data_list
 
@@ -113,11 +126,13 @@ def main():
         sys.exit(1)
     
     url = input('put url: ')
-    url = 'saved_resource.html' #delete
+    #url_test = 'http://localhost:8090' #delete when not test
+    #url = url + resource_file
+    data_list = get_DataIPCam_list(url + '/sd/011/' + resource_file)
     while True:
         #page = urllib.request.urlopen(url)
         #except urllib.request.URLError as exception:
-        data_list = get_DataIPCam_list(url)
+        #data_list = get_DataIPCam_list(url + '' + resource_file)
         folders_list = get_dir_list(data_list)
         
         #for i in range(len(default_questions)):
@@ -128,9 +143,13 @@ def main():
         if choice[1][0] == 'exit':
             sys.exit(1)
         
+        #print(data_list[choice[0] - 1].url + resource_file)
+        print(url + data_list[choice[0] - 1].name + resource_file)
         #url = ''.join([data_list[choice[0] - 1].url, 'saved_resource.html'])
-        url = 'saved_resource.html' #delete
-        #print(url)
+        #url = url + data_list[choice[0] - 1].get_last_dir() + '/' #delete
+        #print(url + resource_file)
+
+        data_list = get_DataIPCam_list(url + data_list[choice[0] - 1].name + resource_file)
 
 if __name__ == '__main__':
     main()

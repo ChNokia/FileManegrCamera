@@ -8,8 +8,10 @@ class DataIPCam(object):
         self.__url_parse = urllib.parse.urlparse(abspath)
         self.__size = size
         self.__name = self.__url_parse.path
-        self.__date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
-        
+        self.__date = None
+
+        if date:
+            self.__date = datetime.datetime.strptime(date, '%Y-%m-%d %H:%M:%S')
         if self.__name == '':
             self.__name = os.path.dirname(abspath)
             self.__is_file = False
