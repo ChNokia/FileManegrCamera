@@ -120,36 +120,58 @@ def main():
     
     #
     default_questions = ['exit', 'put url']
-    choice = do_input()
-    
-    if choice[1] == 'exit':
-        sys.exit(1)
-    
-    url = input('put url: ')
-    #url_test = 'http://localhost:8090' #delete when not test
-    #url = url + resource_file
-    data_list = get_DataIPCam_list(url + '/sd/011/' + resource_file)
+
     while True:
-        #page = urllib.request.urlopen(url)
-        #except urllib.request.URLError as exception:
-        #data_list = get_DataIPCam_list(url + '' + resource_file)
-        folders_list = get_dir_list(data_list)
-        
-        #for i in range(len(default_questions)):
-        folders_list.insert(0, [default_questions[0]])
-        #    print(link)
-        choice = do_input(folders_list)
-        
+        choice = do_input()
+
         if choice[1][0] == 'exit':
             sys.exit(1)
-        
-        #print(data_list[choice[0] - 1].url + resource_file)
-        print(url + data_list[choice[0] - 1].name + resource_file)
-        #url = ''.join([data_list[choice[0] - 1].url, 'saved_resource.html'])
-        #url = url + data_list[choice[0] - 1].get_last_dir() + '/' #delete
-        #print(url + resource_file)
 
-        data_list = get_DataIPCam_list(url + data_list[choice[0] - 1].name + resource_file)
+        url = input('put url: ')
+        #url_test = 'http://localhost:8090' #delete when not test
+        #url = url + resource_file
+        try:
+            data_list = get_DataIPCam_list(url + '/sd/011/' + resource_file)
+            while True:
+                try:
+                    #page = urllib.request.urlopen(url)
+                    #except urllib.request.URLError as exception:
+                    #data_list = get_DataIPCam_list(url + '' + resource_file)
+                    folders_list = get_dir_list(data_list)
+
+                    #for i in range(len(default_questions)):
+                    folders_list.insert(0, [default_questions[0]])
+                    #    print(link)
+                    choice = do_input(folders_list)
+
+                    if choice[1][0] == 'exit':
+                        sys.exit(1)
+
+                    #print(data_list[choice[0] - 1].url + resource_file)
+                    print(url + data_list[choice[0] - 1].name + resource_file)
+                    #url = ''.join([data_list[choice[0] - 1].url, 'saved_resource.html'])
+                    #url = url + data_list[choice[0] - 1].get_last_dir() + '/' #delete
+                    #print(url + resource_file)
+
+                    data_list = get_DataIPCam_list(url + data_list[choice[0] - 1].name + resource_file)
+                except urllib.error.URLError as exception:
+                    print('------1111URLError------')
+                    print(exception)
+                except urllib.error.HTTPError as exception:
+                    print('------HTTPError------')
+                    print(exception)
+                except ValueError as exception:
+                    print('------ValueError------')
+                    print(exception)
+        except urllib.error.URLError as exception:
+            print('------URLError------')
+            print(exception)
+        except urllib.error.HTTPError as exception:
+            print('------HTTPError------')
+            print(exception)
+        except ValueError as exception:
+            print('------ValueError------')
+            print(exception)
 
 if __name__ == '__main__':
     main()
