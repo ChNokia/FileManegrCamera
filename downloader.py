@@ -29,9 +29,9 @@ def get_DataIPCam_list(url):
         str_link = str(link)
         
         if not http:
-            http = re.search('http://192.168.1.3/sd/011/.*\" ', str_link)
+            http = re.search('http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/sd/011/.*\" ', str_link)
         else:
-            http_next = re.search('http://192.168.1.3/sd/011/.*\" ', str_link)
+            http_next = re.search('http://\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/sd/011/.*\" ', str_link)
             
             if http_next:
                 data = DataIPCam.DataIPCam(http.group(0)[:-2], date, size)
@@ -61,13 +61,14 @@ def download_file(url, file_name = None):
     if file_name == None:
         file_name = urllib.parse.urlparse(url)
     
-    file_name = os.path.basename(file_name.path)
+    #file_name = '/home/ubuntu/Desktop/devclub/myProjects/' + file_name#os.path.basename(file_name.path)
     
     try:
         response = urllib.request.urlretrieve(url, file_name)
         
         return True
     except IOError as exception:
+        print(exception)
         raise exception
 
 def do_input(questions_list = [['exit'], ['put url']]):
@@ -141,18 +142,20 @@ def main():
 
                     #for i in range(len(default_questions)):
                     folders_list.insert(0, [default_questions[0]])
+                    folders_list.append(['download files'])
                     #    print(link)
                     choice = do_input(folders_list)
 
                     if choice[1][0] == 'exit':
                         sys.exit(1)
 
-                    #print(data_list[choice[0] - 1].url + resource_file)
-                    print(url + data_list[choice[0] - 1].name + resource_file)
-                    #url = ''.join([data_list[choice[0] - 1].url, 'saved_resource.html'])
-                    #url = url + data_list[choice[0] - 1].get_last_dir() + '/' #delete
-                    #print(url + resource_file)
+                    if choice[1][0] == 'download files':
+                        for obj in [object for object in data_list if object.size]:
+                            print('downloading {0} file from {1}'.format(obj.get_last_dir(), url + obj.name))
+                            if download_file(url + obj.name, obj.get_last_dir()) == True: #download_file(obj.url, obj.name)
+                                print(obj.get_last_dir() + '  download')
 
+                        continue
                     data_list = get_DataIPCam_list(url + data_list[choice[0] - 1].name + resource_file)
                 except urllib.error.URLError as exception:
                     print('------1111URLError------')
